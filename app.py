@@ -177,24 +177,16 @@ if uploaded_file is not None:
     if st.button('Generate Crosstables'):
         st.session_state['count_table'], st.session_state['titlecount'] = crosstable(df, xvar, yvar, max_rows=num_Xrows)
         st.session_state['count_table_generated'] = True
-        #st.write(st.session_state['titlecount'])
-        #st.dataframe(st.session_state['count_table'])
-
+      
         st.session_state['normalized_table_row'], st.session_state['titlenormrow'] = crosstable(df, xvar, yvar, count_table=False, percent_table_by_rows=True, max_rows=num_Xrows)
         st.session_state['normalized_table_row_generated'] = True
-        #st.write(st.session_state['titlenormrow'])
-        #st.dataframe(st.session_state['normalized_table_row'])
-  
+       
         st.session_state['normalized_table_column'], st.session_state['titlenormcol'] = crosstable(df, xvar, yvar, count_table=False, percent_table_by_columns=True, max_rows=num_Xrows)
         st.session_state['normalized_table_column_generated'] = True
-        #st.write(st.session_state['titlenormcol'])
-        #st.dataframe(st.session_state['normalized_table_column'])
-
+        
         st.session_state['normalized_table_overall'], st.session_state['titlenormoverall'] = crosstable(df, xvar, yvar, count_table=False, percent_table_by_overall=True, max_rows=num_Xrows)
         st.session_state['normalized_table_overall_generated'] = True
-        #st.write(st.session_state['titlenormoverall'])
-        #st.dataframe(st.session_state['normalized_table_overall'])   
-
+     
     # Display Crosstables if generated
     if check_session_state('count_table_generated'):
         st.write(st.session_state['titlecount'])
@@ -240,10 +232,7 @@ if uploaded_file is not None:
             st.session_state['value_table_generated'] = False
             st.write("You should select continous variable!")
     
-    #if check_session_state('value_table_generated'):
-    #    st.write(st.session_state['title_with_value'])
-    #    st.dataframe(st.session_state['value_table'])
-
+    
     if st.session_state['value_table_generated']:
         pivot_excel = convert_df_to_excel(st.session_state['value_table'])
         st.download_button(label="Download Pivot as Excel",
