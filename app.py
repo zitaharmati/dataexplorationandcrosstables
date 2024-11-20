@@ -51,9 +51,6 @@ def convert_df_to_excel(df):
     processed_data = output.getvalue()
     return processed_data
 
-import pandas as pd
-from io import BytesIO
-
 def convert_dfs_to_excel(dfs_dict):
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
@@ -62,6 +59,9 @@ def convert_dfs_to_excel(dfs_dict):
         writer._save()
     processed_data = output.getvalue()
     return processed_data
+
+def check_session_state(key):
+    return st.session_state.get(key, False)
 
 @st.cache_data
 def load_data(file):
@@ -78,15 +78,19 @@ uploaded_file = st.file_uploader("Choose a CSV or Excel file", type=["csv", "xls
 
 if uploaded_file is not None:
     if uploaded_file.name.endswith('.csv'):
-        df = load_data(uploaded_file)
-    elif uploaded_file.name.endswith('.xlsx'):
-        df = load_data(uploaded_file)
-    
-    # Create DataFrame from info() output
-    info_df = get_info_df(df)
+        
+        try:
+            df = load_data(uploaded_file)
+        except:
+            st.write("Could not read your file! The file contains unknown characters.")
+            st.stop()
 
-    #st.write("Data Types and Non-Null Counts:")
-    #st.dataframe(info_df)
+    elif uploaded_file.name.endswith('.xlsx'):
+        try:
+            df = load_data(uploaded_file)
+        except:
+            st.write("Could not read your file! The file contains unknown characters.")
+            st.stop()
 
     st.subheader("Column Names:")
     st.write(df.columns.tolist())
@@ -191,8 +195,21 @@ if uploaded_file is not None:
         st.write(st.session_state['titlenormoverall'])
         st.dataframe(st.session_state['normalized_table_overall'])   
 
+    # Display Crosstables if generated
+    if check_session_state('count_table_generated'):
+        st.write(st.session_state['titlecount'])
+        st.dataframe(st.session_state['count_table'])
+    if check_session_state('normalized_table_row_generated'):
+        st.write(st.session_state['titlenormrow'])
+        st.dataframe(st.session_state['normalized_table_row'])
+    if check_session_state('normalized_table_column_generated'):
+        st.write(st.session_state['titlenormcol'])
+        st.dataframe(st.session_state['normalized_table_column'])
+    if check_session_state('normalized_table_overall_generated'):
+        st.write(st.session_state['titlenormoverall'])
+        st.dataframe(st.session_state['normalized_table_overall'])
 
-    if st.session_state['count_table_generated']:
+    if check_session_state('count_table_generated'):
         dfs = {
             'Count_table': st.session_state['count_table'],
             'Normalized_by_row': st.session_state['normalized_table_row'],
@@ -222,7 +239,11 @@ if uploaded_file is not None:
         except:
             st.session_state['value_table_generated'] = False
             st.write("You should select continous variable!")
-   
+    
+    if check_session_state('value_table_generated'):
+        st.write(st.session_state['title_with_value'])
+        st.dataframe(st.session_state['value_table'])
+
     if st.session_state['value_table_generated']:
         pivot_excel = convert_df_to_excel(st.session_state['value_table'])
         st.download_button(label="Download Pivot as Excel",
