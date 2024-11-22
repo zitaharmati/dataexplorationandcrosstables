@@ -12,6 +12,7 @@ import openpyxl
 import xlsxwriter
 import openpyxl.cell._writer
 import seaborn as sns
+import csv
 
 def Corr_Map(df):
     nums = df.select_dtypes(include=np.number)
@@ -66,9 +67,22 @@ def check_session_state(key):
 @st.cache_data
 def load_data(file):
     if file.name.endswith('.csv'):
-        return pd.read_csv(file)
+        try:
+            sample = file.read(2048).decode('utf-8')
+            file.seek(0)
+            sniffer = csv.Sniffer()
+            sep = sniffer.sniff(sample).delimiter
+            file.seek(0)
+            return pd.read_csv(file, sep=sep)
+        except Exception as e:
+            print(f"Error reading CSV file: {e}")
     elif file.name.endswith('.xlsx'):
-        return pd.read_excel(file)
+        try:
+            return pd.read_excel(file)
+        except Exception as e:
+            print(f"Error reading Excel file: {e}")
+    else:
+        print("Unsupported file type: only .csv and .xlsx are supported")
  
 st.title("Exploratory Data Analysis and Crosstable Generation")
 
