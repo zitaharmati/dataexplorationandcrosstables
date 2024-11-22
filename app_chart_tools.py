@@ -74,6 +74,10 @@ def Stats_All_Columns(df):
     col_stats = pd.concat([col_stats,desc.iloc[:,1:]],axis=1)
     col_stats = col_stats.reset_index().rename(columns={'index':'COLUMN' })
     col_stats=round(col_stats,2)
+
+    data_types = {col: str(df[col].dtype) for col in df.columns}
+    col_stats.insert(1, 'Data Type', col_stats['COLUMN'].map(data_types))
+    
     try:
         cstat = col_stats.copy()
         cstat.set_index('COLUMN', inplace=True)
