@@ -6,24 +6,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-
-def geomean(series,hour_to_minute_to_hour=False):
-    ser = series.copy()
-    from scipy.stats import gmean
-    if hour_to_minute_to_hour:
-        ser = ser.dropna()
-        ser.loc[ser<=0]=0.001
-        ser = np.ceil(ser*60)
-        return gmean(ser)/60
-    else:
-        ser = ser.dropna()
-        ser.loc[ser<=0]=0.001
-        ser = np.ceil(ser)
-        return gmean(ser)
-    
-geomean_aggfunc_hour = lambda x: geomean(x,hour_to_minute_to_hour=True)
-geomean_aggfunc = lambda x: geomean(x,hour_to_minute_to_hour=False)
-
 def Percentile(series, q=0.8):
     #perc=np.percentile(a=series, q=q)
     perc=series.quantile(q)
